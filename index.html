@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCS Engineer Dashboard - Power Plant Operations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding-bottom: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f2557 0%, #1a3a6b 100%);
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border-bottom: 3px solid #ffc107;
+        }
+
+        .header h1 {
+            color: #ffc107;
+            font-size: 24px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            text-align: center;
+            color: #b0c4de;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .nav-tabs {
+            background: #1a3a6b;
+            display: flex;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: #b0c4de;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .nav-tab.active {
+            background: #2a5298;
+            color: #ffc107;
+            border-bottom: 3px solid #ffc107;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .tool-section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tool-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card h2 {
+            color: #ffc107;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 2px solid #ffc107;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            color: #b0c4de;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        th {
+            background: #0f2557;
+            color: #ffc107;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            border-bottom: 2px solid #ffc107;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #6c757d;
+            color: white;
+        }
+
+        .status-in-progress {
+            background: #007bff;
+            color: white;
+        }
+
+        .status-completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-overdue {
+            background: #dc3545;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .alarm-critical {
+            background: rgba(220, 53, 69, 0.2);
+            border-left: 4px solid #dc3545;
+        }
+
+        .alarm-warning {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 4px solid #ffc107;
+        }
+
+        .alarm-info {
+            background: rgba(23, 162, 184, 0.2);
+            border-left: 4px solid #17a2b8;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .calendar-day {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            min-height: 80px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .calendar-day:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
+        .calendar-day.has-pm {
+            background: rgba(255, 193, 7, 0.3);
+            border: 2px solid #ffc107;
+        }
+
+        .calendar-day.today {
+            background: rgba(40, 167, 69, 0.3);
+            border: 2px solid #28a745;
+        }
+
+        .calendar-header {
+            font-weight: bold;
+            color: #ffc107;
+            background: #0f2557;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #ffc107;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffc107;
+        }
+
+        .stat-label {
+            color: #b0c4de;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #ffc107;
+        }
+
+        .inventory-low {
+            background: rgba(220, 53, 69, 0.3);
+        }
+
+        .inventory-ok {
+            background: rgba(40, 167, 69, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .nav-tab {
+                font-size: 12px;
+                padding: 12px 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 2px;
+            }
+
+            .calendar-day {
+                padding: 5px;
+                min-height: 60px;
+                font-size: 11px;
+            }
+
+            table {
+                font-size: 11px;
+            }
+
+            th, td {
+                padding: 8px 6px;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ffc107;
+            padding-bottom: 10px;
+        }
+
+        .modal-close {
+            font-size: 28px;
+            cursor: pointer;
+            color: #dc3545;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚡ DCS Engineer Dashboard - Power Plant Operations</h1>
+        <p>Complete Offline Tool Suite for Philippine Power Plants | Updated: <span id="currentDateTime"></span></p>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('pm-tracker')">📋 PM & Work Orders</button>
+        <button class="nav-tab" onclick="switchTab('alarm-log')">🚨 Alarm Log</button>
+        <button class="nav-tab" onclick="switchTab('daily-ops')">✅ Daily Ops</button>
+        <button class="nav-tab" onclick="switchTab('calibration')">🔧 I/O Calibration</button>
+        <button class="nav-tab" onclick="switchTab('inventory')">📦 Spare Parts</button>
+    </div>
+
+    <div class="container">
+        <!-- PM & Work Order Tracker -->
+        <div id="pm-tracker" class="tool-section active">
+            <div class="card">
+                <h2>📋 Preventive Maintenance & Work Order Tracker</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="pmPendingCount">0</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pmInProgressCount">0</div>
+                        <div class="stat-label">In Progress</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pmOverdueCount">0</div>
+                        <div class="stat-label">Overdue</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pmCompletedCount">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showPMModal()">➕ Add New PM/Work Order</button>
+                <button class="btn btn-secondary" onclick="exportPMData()">📥 Export CSV</button>
+
+                <h3 style="color: #ffc107; margin-top: 30px;">Calendar View - <span id="currentMonthYear"></span></h3>
+                <div class="calendar" id="pmCalendar"></div>
+
+                <h3 style="color: #ffc107; margin-top: 30px;">Work Orders List</h3>
+                <input type="text" class="search-box" id="pmSearchBox" placeholder="🔍 Search by task, equipment, or system..." onkeyup="filterPMTable()">
+                
+                <div class="table-container">
+                    <table id="pmTable">
+                        <thead>
+                            <tr>
+                                <th>WO#</th>
+                                <th>Task Description</th>
+                                <th>Equipment/System</th>
+                                <th>Frequency</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pmTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alarm Log -->
+        <div id="alarm-log" class="tool-section">
+            <div class="card">
+                <h2>🚨 DCS Alarm Log & Troubleshooting Guide</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="alarmCriticalCount">0</div>
+                        <div class="stat-label">Critical Alarms</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="alarmWarningCount">0</div>
+                        <div class="stat-label">Warnings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="alarmInfoCount">0</div>
+                        <div class="stat-label">Info Messages</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="alarmTotalCount">0</div>
+                        <div class="stat-label">Total Today</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showAlarmModal()">➕ Log New Alarm</button>
+                <button class="btn btn-warning" onclick="acknowledgeAllAlarms()">✓ Acknowledge All</button>
+                <button class="btn btn-secondary" onclick="exportAlarmData()">📥 Export CSV</button>
+
+                <input type="text" class="search-box" id="alarmSearchBox" placeholder="🔍 Search alarms by tag, description, or system..." onkeyup="filterAlarmTable()">
+                
+                <div class="table-container">
+                    <table id="alarmTable">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Priority</th>
+                                <th>Tag/Point</th>
+                                <th>Description</th>
+                                <th>System</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alarmTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <h2>📖 Common DCS Alarms Quick Reference</h2>
+                <input type="text" class="search-box" id="alarmRefSearch" placeholder="🔍 Search alarm reference..." onkeyup="filterAlarmReference()">
+                <div id="alarmReferenceList"></div>
+            </div>
+        </div>
+
+        <!-- Daily Operations -->
+        <div id="daily-ops" class="tool-section">
+            <div class="card">
+                <h2>✅ Daily Operations Checklist & Shift Log</h2>
+                
+                <button class="btn btn-primary" onclick="showShiftModal()">➕ New Shift Entry</button>
+                <button class="btn btn-secondary" onclick="exportShiftData()">📥 Export CSV</button>
+
+                <h3 style="color: #ffc107; margin-top: 20px;">Today's Shift Logs</h3>
+                <div class="table-container">
+                    <table id="shiftTable">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Shift</th>
+                                <th>Engineer</th>
+                                <th>Checklist Status</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shiftTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <h2>🔍 Pre-Shift DCS Health Check</h2>
+                <div id="healthCheckList"></div>
+                <button class="btn btn-primary" onclick="saveHealthCheck()">💾 Save Health Check</button>
+            </div>
+        </div>
+
+        <!-- Calibration Tracker -->
+        <div id="calibration" class="tool-section">
+            <div class="card">
+                <h2>🔧 I/O Point Calibration Tracker</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="calDueCount">0</div>
+                        <div class="stat-label">Due This Month</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="calOverdueCount">0</div>
+                        <div class="stat-label">Overdue</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="calCompletedCount">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="calTotalCount">0</div>
+                        <div class="stat-label">Total Points</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showCalibrationModal()">➕ Add Calibration Point</button>
+                <button class="btn btn-secondary" onclick="exportCalibrationData()">📥 Export CSV</button>
+
+                <input type="text" class="search-box" id="calSearchBox" placeholder="🔍 Search by tag, description, or loop..." onkeyup="filterCalibrationTable()">
+                
+                <div class="table-container">
+                    <table id="calibrationTable">
+                        <thead>
+                            <tr>
+                                <th>Tag</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Range</th>
+                                <th>Last Cal Date</th>
+                                <th>Next Due</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="calibrationTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spare Parts Inventory -->
+        <div id="inventory" class="tool-section">
+            <div class="card">
+                <h2>📦 Spare Parts & Tools Inventory Manager</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="invLowStockCount">0</div>
+                        <div class="stat-label">Low Stock Items</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="invTotalItems">0</div>
+                        <div class="stat-label">Total Items</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="invTotalValue">₱0</div>
+                        <div class="stat-label">Total Value</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="invOutCount">0</div>
+                        <div class="stat-label">Items Issued</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showInventoryModal()">➕ Add Item</button>
+                <button class="btn btn-warning" onclick="showIssueModal()">📤 Issue Item</button>
+                <button class="btn btn-secondary" onclick="exportInventoryData()">📥 Export CSV</button>
+
+                <input type="text" class="search-box" id="invSearchBox" placeholder="🔍 Search by part number, description, or category..." onkeyup="filterInventoryTable()">
+                
+                <div class="table-container">
+                    <table id="inventoryTable">
+                        <thead>
+                            <tr>
+                                <th>Part Number</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Min</th>
+                                <th>Unit Price</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PM Modal -->
+    <div id="pmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: #ffc107;">Add/Edit PM Work Order</h2>
+                <span class="modal-close" onclick="closePMModal()">&times;</span>
+            </div>
+            <form id="pmForm">
+                <input type="hidden" id="pmId">
+                <div class="form-group">
+                    <label>Work Order Number</label>
+                    <input type="text" id="pmWoNumber" required>
+                </div>
+                <div class="form-group">
+                    <label>Task Description</label>
+                    <textarea id="pmTaskDesc" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Equipment/System</label>
+                    <input type="text" id="pmEquipment" required>
+                </div>
+                <div class="form-group">
+                    <label>Frequency</label>
+                    <select id="pmFrequency" required>
+                        <option value="Monthly">Monthly</option>
+                        <option value="Quarterly">Quarterly</option>
+                        <option value="Semi-Annual">Semi-Annual</option>
+                        <option value="Annual">Annual</option>
+                        <option value="One-Time">One-Time</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <input type="date" id="pmDueDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="pmStatus" required>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Assigned To</label>
+                    <input type="text" id="pmAssignedTo" required>
+                </div>
+                <div class="form-group">
+                    <label>Spare Parts Needed</label>
+                    <textarea id="pmSpareParts" placeholder="List required spare parts..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Save Work Order</button>
+                <button type="button" class="btn btn-secondary" onclick="closePMModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alarm Modal -->
+    <div id="alarmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: #ffc107;">Log New Alarm</h2>
+                <span class="modal-close" onclick="closeAlarmModal()">&times;</span>
+            </div>
+            <form id="alarmForm">
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="alarmPriority" required>
+                        <option value="Critical">Critical</option>
+                        <option value="Warning">Warning</option>
+                        <option value="Info">Info</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tag/Point</label>
+                    <input type="text" id="alarmTag" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="alarmDesc" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>DCS System</label>
+                    <select id="alarmSystem" required>
+                        <option value="Emerson Ovation">Emerson Ovation</option>
+                        <option value="Siemens SPPA-T3000">Siemens SPPA-T3000</option>
+                        <option value="ABB 800xA">ABB 800xA</option>
+                        <option value="Yokogawa CENTUM">Yokogawa CENTUM</option>
+                        <option value="Honeywell Experion">Honeywell Experion</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Action Taken</label>
+                    <textarea id="alarmAction" placeholder="Describe troubleshooting steps..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Log Alarm</button>
+                <button type="button" class="btn btn-secondary" onclick="closeAlarmModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Shift Modal -->
+    <div id="shiftModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: #ffc107;">New Shift Entry</h2>
+                <span class="modal-close" onclick="closeShiftModal()">&times;</span>
+            </div>
+            <form id="shiftForm">
+                <div class="form-group">
+                    <label>Shift</label>
+                    <select id="shiftType" required>
+                        <option value="Day">Day Shift (7AM - 7PM)</option>
+                        <option value="Night">Night Shift (7PM - 7AM)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Engineer Name</label>
+                    <input type="text" id="shiftEngineer" required>
+                </div>
+                <div class="form-group">
+                    <label>Checklist Completed?</label>
+                    <select id="shiftChecklist" required>
+                        <option value="Yes">Yes - All Checks Passed</option>
+                        <option value="Partial">Partial - Some Issues Found</option>
+                        <option value="No">No - Critical Issues</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Shift Notes / Handover</label>
+                    <textarea id="shiftNotes" required placeholder="Key events, parameter changes, ongoing issues..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Save Shift Entry</button>
+                <button type="button" class="btn btn-secondary" onclick="closeShiftModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Calibration Modal -->
+    <div id="calibrationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: #ffc107;">Add/Edit Calibration Point</h2>
+                <span class="modal-close" onclick="closeCalibrationModal()">&times;</span>
+            </div>
+            <form id="calibrationForm">
+                <input type="hidden" id="calId">
+                <div class="form-group">
+                    <label>Tag</label>
+                    <input type="text" id="calTag" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="calDesc" required>
+                </div>
+                <div class="form-group">
+                    <label>I/O Type</label>
+                    <select id="calType" required>
+                        <option value="AI">Analog Input (AI)</option>
+                        <option value="AO">Analog Output (AO)</option>
+                        <option value="DI">Digital Input (DI)</option>
+                        <option value="DO">Digital Output (DO)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Range</label>
+                    <input type="text" id="calRange" placeholder="e.g., 4-20mA, 0-100°C" required>
+                </div>
+                <div class="form-group">
+                    <label>Last Calibration Date</label>
+                    <input type="date" id="calLastDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Calibration Interval (months)</label>
+                    <input type="number" id="calInterval" value="12" required>
+                </div>
+                <div class="form-group">
+                    <label>As-Found Value</label>
+                    <input type="text" id="calAsFound">
+                </div>
+                <div class="form-group">
+                    <label>As-Left Value</label>
+                    <input type="text" id="calAsLeft">
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Save Calibration Point</button>
+                <button type="button" class="btn btn-secondary" onclick="closeCalibrationModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Inventory Modal -->
+    <div id="inventoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: #ffc107;">Add/Edit Inventory Item</h2>
+                <span class="modal-close" onclick="closeInventoryModal()">&times;</span>
+            </div>
+            <form id="inventoryForm">
+                <input type="hidden" id="invId">
+                <div class="form-group">
+                    <label>Part Number</label>
+                    <input type="text" id="invPartNumber" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="invDesc" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="invCategory" required>
+                        <option value="AI Card">AI Card</option>
+                        <option value="AO Card">AO Card</option>
+                        <option value="DI Card">DI Card</option>
+                        <option value="DO Card">DO Card</option>
+                        <option value="Power Supply">Power Supply</option>
+                        <option value="Network Switch">Network Switch</option>
+                        <option value="Controller">Controller</option>
+                        <option value="HMI">HMI/Workstation</option>
+                        <option value="Cables">Cables & Connectors</option>
+                        <option value="Tools">Tools & Equipment</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Current Stock</label>
+                    <input type="number" id="invStock" required>
+                </div>
+                <div class="form-group">
+                    <label>Minimum Stock</label>
+                    <input type="number" id="invMin" required>
+                </div>
+                <div class="form-group">
+                    <label>Unit Price (₱)</label>
+                    <input type="number" id="invPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Storage Location</label>
+                    <input type="text" id="invLocation" required>
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Save Item</button>
+                <button type="button" class="btn btn-secondary" onclick="closeInventoryModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Issue Item Modal -->
+    <div id="issueModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: #ffc107;">Issue Spare Part</h2>
+                <span class="modal-close" onclick="closeIssueModal()">&times;</span>
+            </div>
+            <form id="issueForm">
+                <div class="form-group">
+                    <label>Select Item</label>
+                    <select id="issueItemSelect" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" id="issueQty" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Issued To</label>
+                    <input type="text" id="issueTo" required>
+                </div>
+                <div class="form-group">
+                    <label>Purpose / Work Order</label>
+                    <textarea id="issuePurpose" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">📤 Issue Item</button>
+                <button type="button" class="btn btn-secondary" onclick="closeIssueModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global Data Storage
+        let pmData = [];
+        let alarmData = [];
+        let shiftData = [];
+        let calibrationData = [];
+        let inventoryData = [];
+
+        // Initialize App
+        function initApp() {
+            loadData();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            renderAllViews();
+            loadSampleData();
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentDateTime').textContent = now.toLocaleString('en-PH');
+        }
+
+        // Tab Switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tool-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+            renderAllViews();
+        }
+
+        // Data Persistence
+        function saveData() {
+            localStorage.setItem('dcs_pm_data', JSON.stringify(pmData));
+            localStorage.setItem('dcs_alarm_data', JSON.stringify(alarmData));
+            localStorage.setItem('dcs_shift_data', JSON.stringify(shiftData));
+            localStorage.setItem('dcs_calibration_data', JSON.stringify(calibrationData));
+            localStorage.setItem('dcs_inventory_data', JSON.stringify(inventoryData));
+        }
+
+        function loadData() {
+            pmData = JSON.parse(localStorage.getItem('dcs_pm_data') || '[]');
+            alarmData = JSON.parse(localStorage.getItem('dcs_alarm_data') || '[]');
+            shiftData = JSON.parse(localStorage.getItem('dcs_shift_data') || '[]');
+            calibrationData = JSON.parse(localStorage.getItem('dcs_calibration_data') || '[]');
+            inventoryData = JSON.parse(localStorage.getItem('dcs_inventory_data') || '[]');
+        }
+
+        // PM Functions
+        function renderPMView() {
+            renderPMStats();
+            renderPMCalendar();
+            renderPMTable();
+        }
+
+        function renderPMStats() {
+            const now = new Date();
+            const pending = pmData.filter(pm => pm.status === 'Pending').length;
+            const inProgress = pmData.filter(pm => pm.status === 'In Progress').length;
+            const completed = pmData.filter(pm => pm.status === 'Completed').length;
+            const overdue = pmData.filter(pm => {
+                return pm.status !== 'Completed' && new Date(pm.dueDate) < now;
+            }).length;
+
+            document.getElementById('pmPendingCount').textContent = pending;
+            document.getElementById('pmInProgressCount').textContent = inProgress;
+            document.getElementById('pmCompletedCount').textContent = completed;
+            document.getElementById('pmOverdueCount').textContent = overdue;
+        }
+
+        function renderPMCalendar() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            
+            document.getElementById('currentMonthYear').textContent = 
+                now.toLocaleString('en-PH', { month: 'long', year: 'numeric' });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            let calendarHTML = '';
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            
+            dayNames.forEach(day => {
+                calendarHTML += `<div class="calendar-header">${day}</div>`;
+            });
+
+            for (let i = 0; i < firstDay; i++) {
+                calendarHTML += `<div class="calendar-day"></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateStr = date.toISOString().split('T')[0];
+                const hasPM = pmData.some(pm => pm.dueDate === dateStr);
+                const isToday = day === now.getDate();
+                
+                let classes = 'calendar-day';
+                if (hasPM) classes += ' has-pm';
+                if (isToday) classes += ' today';
+                
+                const pmCount = pmData.filter(pm => pm.dueDate === dateStr).length;
+                const pmText = pmCount > 0 ? `<br><small>${pmCount} PM(s)</small>` : '';
+                
+                calendarHTML += `<div class="${classes}" onclick="viewPMsByDate('${dateStr}')">${day}${pmText}</div>`;
+            }
+
+            document.getElementById('pmCalendar').innerHTML = calendarHTML;
+        }
+
+        function viewPMsByDate(date) {
+            const pms = pmData.filter(pm => pm.dueDate === date);
+            if (pms.length > 0) {
+                alert(`PMs on ${date}:\n\n${pms.map(pm => `- ${pm.taskDesc} (${pm.status})`).join('\n')}`);
+            }
+        }
+
+        function renderPMTable() {
+            const tbody = document.getElementById('pmTableBody');
+            const searchTerm = document.getElementById('pmSearchBox')?.value.toLowerCase() || '';
+            
+            let filteredData = pmData.filter(pm => {
+                return pm.woNumber.toLowerCase().includes(searchTerm) ||
+                       pm.taskDesc.toLowerCase().includes(searchTerm) ||
+                       pm.equipment.toLowerCase().includes(searchTerm);
+            });
+
+            tbody.innerHTML = filteredData.map(pm => {
+                const now = new Date();
+                const dueDate = new Date(pm.dueDate);
+                const isOverdue = pm.status !== 'Completed' && dueDate < now;
+                
+                let statusClass = 'status-' + pm.status.toLowerCase().replace(' ', '-');
+                if (isOverdue && pm.status !== 'Completed') {
+                    statusClass = 'status-overdue';
+                }
+
+                return `
+                    <tr>
+                        <td>${pm.woNumber}</td>
+                        <td>${pm.taskDesc}</td>
+                        <td>${pm.equipment}</td>
+                        <td>${pm.frequency}</td>
+                        <td>${pm.dueDate}</td>
+                        <td><span class="status-badge ${statusClass}">${isOverdue ? 'Overdue' : pm.status}</span></td>
+                        <td>${pm.assignedTo}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-primary" onclick="editPM('${pm.id}')">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deletePM('${pm.id}')">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterPMTable() {
+            renderPMTable();
+        }
+
+        function showPMModal(id = null) {
+            document.getElementById('pmModal').classList.add('active');
+            document.getElementById('pmForm').reset();
+            
+            if (id) {
+                const pm = pmData.find(p => p.id === id);
+                if (pm) {
+                    document.getElementById('pmId').value = pm.id;
+                    document.getElementById('pmWoNumber').value = pm.woNumber;
+                    document.getElementById('pmTaskDesc').value = pm.taskDesc;
+                    document.getElementById('pmEquipment').value = pm.equipment;
+                    document.getElementById('pmFrequency').value = pm.frequency;
+                    document.getElementById('pmDueDate').value = pm.dueDate;
+                    document.getElementById('pmStatus').value = pm.status;
+                    document.getElementById('pmAssignedTo').value = pm.assignedTo;
+                    document.getElementById('pmSpareParts').value = pm.spareParts || '';
+                }
+            }
+        }
+
+        function closePMModal() {
+            document.getElementById('pmModal').classList.remove('active');
+        }
+
+        function editPM(id) {
+            showPMModal(id);
+        }
+
+        function deletePM(id) {
+            if (confirm('Delete this work order?')) {
+                pmData = pmData.filter(pm => pm.id !== id);
+                saveData();
+                renderPMView();
+            }
+        }
+
+        document.getElementById('pmForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('pmId').value || Date.now().toString();
+            const pmItem = {
+                id: id,
+                woNumber: document.getElementById('pmWoNumber').value,
+                taskDesc: document.getElementById('pmTaskDesc').value,
+                equipment: document.getElementById('pmEquipment').value,
+                frequency: document.getElementById('pmFrequency').value,
+                dueDate: document.getElementById('pmDueDate').value,
+                status: document.getElementById('pmStatus').value,
+                assignedTo: document.getElementById('pmAssignedTo').value,
+                spareParts: document.getElementById('pmSpareParts').value
+            };
+
+            const existingIndex = pmData.findIndex(pm => pm.id === id);
+            if (existingIndex >= 0) {
+                pmData[existingIndex] = pmItem;
+            } else {
+                pmData.push(pmItem);
+            }
+
+            saveData();
+            closePMModal();
+            renderPMView();
+        });
+
+        function exportPMData() {
+            const csv = [
+                ['WO#', 'Task', 'Equipment', 'Frequency', 'Due Date', 'Status', 'Assigned To', 'Spare Parts'],
+                ...pmData.map(pm => [pm.woNumber, pm.taskDesc, pm.equipment, pm.frequency, pm.dueDate, pm.status, pm.assignedTo, pm.spareParts || ''])
+            ].map(row => row.join(',')).join('\n');
+
+            downloadCSV(csv, 'pm_work_orders.csv');
+        }
+
+        // Alarm Functions
+        function renderAlarmView() {
+            renderAlarmStats();
+            renderAlarmTable();
+            renderAlarmReference();
+        }
+
+        function renderAlarmStats() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayAlarms = alarmData.filter(alarm => alarm.timestamp.startsWith(today));
+            
+            const critical = todayAlarms.filter(a => a.priority === 'Critical').length;
+            const warning = todayAlarms.filter(a => a.priority === 'Warning').length;
+            const info = todayAlarms.filter(a => a.priority === 'Info').length;
+
+            document.getElementById('alarmCriticalCount').textContent = critical;
+            document.getElementById('alarmWarningCount').textContent = warning;
+            document.getElementById('alarmInfoCount').textContent = info;
+            document.getElementById('alarmTotalCount').textContent = todayAlarms.length;
+        }
+
+        function renderAlarmTable() {
+            const tbody = document.getElementById('alarmTableBody');
+            const searchTerm = document.getElementById('alarmSearchBox')?.value.toLowerCase() || '';
+            
+            let filteredData = alarmData.filter(alarm => {
+                return alarm.tag.toLowerCase().includes(searchTerm) ||
+                       alarm.description.toLowerCase().includes(searchTerm) ||
+                       alarm.system.toLowerCase().includes(searchTerm);
+            });
+
+            tbody.innerHTML = filteredData.map(alarm => {
+                let rowClass = '';
+                if (alarm.priority === 'Critical') rowClass = 'alarm-critical';
+                else if (alarm.priority === 'Warning') rowClass = 'alarm-warning';
+                else rowClass = 'alarm-info';
+
+                return `
+                    <tr class="${rowClass}">
+                        <td>${alarm.timestamp}</td>
+                        <td><span class="status-badge">${alarm.priority}</span></td>
+                        <td>${alarm.tag}</td>
+                        <td>${alarm.description}</td>
+                        <td>${alarm.system}</td>
+                        <td>${alarm.acknowledged ? '✓ ACK' : '⚠ Active'}</td>
+                        <td class="action-buttons">
+                            ${!alarm.acknowledged ? `<button class="btn btn-sm btn-warning" onclick="acknowledgeAlarm('${alarm.id}')">ACK</button>` : ''}
+                            <button class="btn btn-sm btn-danger" onclick="deleteAlarm('${alarm.id}')">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterAlarmTable() {
+            renderAlarmTable();
+        }
+
+        function showAlarmModal() {
+            document.getElementById('alarmModal').classList.add('active');
+            document.getElementById('alarmForm').reset();
+        }
+
+        function closeAlarmModal() {
+            document.getElementById('alarmModal').classList.remove('active');
+        }
+
+        function acknowledgeAlarm(id) {
+            const alarm = alarmData.find(a => a.id === id);
+            if (alarm) {
+                alarm.acknowledged = true;
+                saveData();
+                renderAlarmView();
+            }
+        }
+
+        function acknowledgeAllAlarms() {
+            if (confirm('Acknowledge all active alarms?')) {
+                alarmData.forEach(alarm => alarm.acknowledged = true);
+                saveData();
+                renderAlarmView();
+            }
+        }
+
+        function deleteAlarm(id) {
+            if (confirm('Delete this alarm entry?')) {
+                alarmData = alarmData.filter(alarm => alarm.id !== id);
+                saveData();
+                renderAlarmView();
+            }
+        }
+
+        document.getElementById('alarmForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const alarmItem = {
+                id: Date.now().toString(),
+                timestamp: new Date().toLocaleString('en-PH'),
+                priority: document.getElementById('alarmPriority').value,
+                tag: document.getElementById('alarmTag').value,
+                description: document.getElementById('alarmDesc').value,
+                system: document.getElementById('alarmSystem').value,
+                action: document.getElementById('alarmAction').value,
+                acknowledged: false
+            };
+
+            alarmData.unshift(alarmItem);
+            saveData();
+            closeAlarmModal();
+            renderAlarmView();
+        });
+
+        function exportAlarmData() {
+            const csv = [
+                ['Timestamp', 'Priority', 'Tag', 'Description', 'System', 'Acknowledged', 'Action'],
+                ...alarmData.map(alarm => [alarm.timestamp, alarm.priority, alarm.tag, alarm.description, alarm.system, alarm.acknowledged ? 'Yes' : 'No', alarm.action || ''])
+            ].map(row => row.join(',')).join('\n');
+
+            downloadCSV(csv, 'alarm_log.csv');
+        }
+
+        function renderAlarmReference() {
+            const references = [
+                { alarm: 'CONTROLLER_FAIL', system: 'All', desc: 'Controller redundancy lost', action: 'Check backup controller status, verify network connection, swap controllers if needed' },
+                { alarm: 'IO_COMM_FAIL', system: 'All', desc: 'I/O card communication failure', action: 'Check card LEDs, verify termination resistors, check network cables, swap card if needed' },
+                { alarm: 'POWER_SUPPLY_FAIL', system: 'All', desc: 'Redundant power supply failure', action: 'Check PSU LEDs, verify AC input, measure DC output voltage, replace faulty PSU' },
+                { alarm: 'HMI_SERVER_DOWN', system: 'All', desc: 'Operator workstation offline', action: 'Check server status, verify network connection, restart services, check licenses' },
+                { alarm: 'HISTORIAN_BUFFER_FULL', system: 'All', desc: 'Data historian buffer overflow', action: 'Check historian service, verify database connection, free disk space, restart buffer service' },
+                { alarm: 'AI_SENSOR_FAIL', system: 'All', desc: 'Analog input sensor failure', action: 'Verify sensor wiring, check 4-20mA loop, test with calibrator, check card input' },
+                { alarm: 'AO_SATURATED', system: 'All', desc: 'Analog output at limit', action: 'Check valve/damper position, verify control loop tuning, check for stuck actuator' },
+                { alarm: 'NETWORK_DELAY', system: 'All', desc: 'High network latency detected', action: 'Check network traffic, verify switch configuration, check for cable faults' }
+            ];
+
+            const searchTerm = document.getElementById('alarmRefSearch')?.value.toLowerCase() || '';
+            const filtered = references.filter(ref => 
+                ref.alarm.toLowerCase().includes(searchTerm) ||
+                ref.desc.toLowerCase().includes(searchTerm) ||
+                ref.action.toLowerCase().includes(searchTerm)
+            );
+
+            document.getElementById('alarmReferenceList').innerHTML = filtered.map(ref => `
+                <div class="card" style="margin-bottom: 15px; padding: 15px;">
+                    <h3 style="color: #dc3545; margin-bottom: 10px;">${ref.alarm}</h3>
+                    <p style="color: #b0c4de; margin-bottom: 5px;"><strong>System:</strong> ${ref.system}</p>
+                    <p style="color: #e0e0e0; margin-bottom: 10px;">${ref.desc}</p>
+                    <p style="color: #28a745;"><strong>Action:</strong> ${ref.action}</p>
+                </div>
+            `).join('');
+        }
+
+        function filterAlarmReference() {
+            renderAlarmReference();
+        }
+
+        // Shift Functions
+        function renderShiftView() {
+            renderShiftTable();
+            renderHealthCheck();
+        }
+
+        function renderShiftTable() {
+            const tbody = document.getElementById('shiftTableBody');
+            const today = new Date().toISOString().split('T')[0];
+            const todayShifts = shiftData.filter(shift => shift.date === today);
+
+            tbody.innerHTML = todayShifts.map(shift => `
+                <tr>
+                    <td>${shift.time}</td>
+                    <td>${shift.shiftType}</td>
+                    <td>${shift.engineer}</td>
+                    <td><span class="status-badge ${shift.checklist === 'Yes' ? 'status-completed' : shift.checklist === 'No' ? 'status-overdue' : 'status-in-progress'}">${shift.checklist}</span></td>
+                    <td>${shift.notes}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-danger" onclick="deleteShift('${shift.id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderHealthCheck() {
+            const checks = [
+                'DCS Controllers - Check redundancy status (Primary/Backup)',
+                'Network Communication - Verify all I/O cards online',
+                'Power Supplies - Check all PSU LEDs green',
+                'HMI/Workstations - Verify all operator stations online',
+                'Data Historian - Check data logging status',
+                'Backup Systems - Verify last backup timestamp',
+                'Critical Alarms - Review active alarm list',
+                'Control Loops - Verify all loops in AUTO mode',
+                'Trending - Check parameter trends for abnormalities',
+                'UPS Status - Verify battery backup system'
+            ];
+
+            document.getElementById('healthCheckList').innerHTML = checks.map((check, idx) => `
+                <div style="margin-bottom: 10px;">
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="health_${idx}" style="margin-right: 10px; width: 18px; height: 18px;">
+                        <span style="color: #e0e0e0;">${check}</span>
+                    </label>
+                </div>
+            `).join('');
+        }
+
+        function showShiftModal() {
+            document.getElementById('shiftModal').classList.add('active');
+            document.getElementById('shiftForm').reset();
+        }
+
+        function closeShiftModal() {
+            document.getElementById('shiftModal').classList.remove('active');
+        }
+
+        function deleteShift(id) {
+            if (confirm('Delete this shift entry?')) {
+                shiftData = shiftData.filter(shift => shift.id !== id);
+                saveData();
+                renderShiftView();
+            }
+        }
+
+        document.getElementById('shiftForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const shiftItem = {
+                id: Date.now().toString(),
+                date: new Date().toISOString().split('T')[0],
+                time: new Date().toLocaleTimeString('en-PH'),
+                shiftType: document.getElementById('shiftType').value,
+                engineer: document.getElementById('shiftEngineer').value,
+                checklist: document.getElementById('shiftChecklist').value,
+                notes: document.getElementById('shiftNotes').value
+            };
+
+            shiftData.unshift(shiftItem);
+            saveData();
+            closeShiftModal();
+            renderShiftView();
+        });
+
+        function saveHealthCheck() {
+            const checks = document.querySelectorAll('[id^="health_"]');
+            const results = Array.from(checks).map((check, idx) => ({
+                item: check.parentElement.textContent.trim(),
+                checked: check.checked
+            }));
+
+            const allPassed = results.every(r => r.checked);
+            const timestamp = new Date().toLocaleString('en-PH');
+
+            alert(`Health Check Saved!\nTimestamp: ${timestamp}\nStatus: ${allPassed ? '✓ All Checks Passed' : '⚠ Some Issues Found'}\n\nResults stored in shift log.`);
+        }
+
+        function exportShiftData() {
+            const csv = [
+                ['Date', 'Time', 'Shift', 'Engineer', 'Checklist', 'Notes'],
+                ...shiftData.map(shift => [shift.date, shift.time, shift.shiftType, shift.engineer, shift.checklist, shift.notes])
+            ].map(row => row.join(',')).join('\n');
+
+            downloadCSV(csv, 'shift_log.csv');
+        }
+
+        // Calibration Functions
+        function renderCalibrationView() {
+            renderCalibrationStats();
+            renderCalibrationTable();
+        }
+
+        function renderCalibrationStats() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            const dueThisMonth = calibrationData.filter(cal => {
+                const nextDue = calculateNextCalDate(cal.lastDate, cal.interval);
+                const dueDate = new Date(nextDue);
+                return dueDate.getMonth() === currentMonth && dueDate.getFullYear() === currentYear;
+            }).length;
+
+            const overdue = calibrationData.filter(cal => {
+                const nextDue = calculateNextCalDate(cal.lastDate, cal.interval);
+                return new Date(nextDue) < now;
+            }).length;
+
+            const completed = calibrationData.filter(cal => {
+                const nextDue = calculateNextCalDate(cal.lastDate, cal.interval);
+                return new Date(nextDue) > now;
+            }).length;
+
+            document.getElementById('calDueCount').textContent = dueThisMonth;
+            document.getElementById('calOverdueCount').textContent = overdue;
+            document.getElementById('calCompletedCount').textContent = completed;
+            document.getElementById('calTotalCount').textContent = calibrationData.length;
+        }
+
+        function calculateNextCalDate(lastDate, interval) {
+            const date = new Date(lastDate);
+            date.setMonth(date.getMonth() + parseInt(interval));
+            return date.toISOString().split('T')[0];
+        }
+
+        function renderCalibrationTable() {
+            const tbody = document.getElementById('calibrationTableBody');
+            const searchTerm = document.getElementById('calSearchBox')?.value.toLowerCase() || '';
+            
+            let filteredData = calibrationData.filter(cal => {
+                return cal.tag.toLowerCase().includes(searchTerm) ||
+                       cal.description.toLowerCase().includes(searchTerm) ||
+                       cal.type.toLowerCase().includes(searchTerm);
+            });
+
+            tbody.innerHTML = filteredData.map(cal => {
+                const nextDue = calculateNextCalDate(cal.lastDate, cal.interval);
+                const isOverdue = new Date(nextDue) < new Date();
+                
+                return `
+                    <tr>
+                        <td>${cal.tag}</td>
+                        <td>${cal.description}</td>
+                        <td><span class="status-badge">${cal.type}</span></td>
+                        <td>${cal.range}</td>
+                        <td>${cal.lastDate}</td>
+                        <td>${nextDue}</td>
+                        <td><span class="status-badge ${isOverdue ? 'status-overdue' : 'status-completed'}">${isOverdue ? 'Overdue' : 'OK'}</span></td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-primary" onclick="editCalibration('${cal.id}')">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCalibration('${cal.id}')">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterCalibrationTable() {
+            renderCalibrationTable();
+        }
+
+        function showCalibrationModal(id = null) {
+            document.getElementById('calibrationModal').classList.add('active');
+            document.getElementById('calibrationForm').reset();
+            
+            if (id) {
+                const cal = calibrationData.find(c => c.id === id);
+                if (cal) {
+                    document.getElementById('calId').value = cal.id;
+                    document.getElementById('calTag').value = cal.tag;
+                    document.getElementById('calDesc').value = cal.description;
+                    document.getElementById('calType').value = cal.type;
+                    document.getElementById('calRange').value = cal.range;
+                    document.getElementById('calLastDate').value = cal.lastDate;
+                    document.getElementById('calInterval').value = cal.interval;
+                    document.getElementById('calAsFound').value = cal.asFound || '';
+                    document.getElementById('calAsLeft').value = cal.asLeft || '';
+                }
+            }
+        }
+
+        function closeCalibrationModal() {
+            document.getElementById('calibrationModal').classList.remove('active');
+        }
+
+        function editCalibration(id) {
+            showCalibrationModal(id);
+        }
+
+        function deleteCalibration(id) {
+            if (confirm('Delete this calibration point?')) {
+                calibrationData = calibrationData.filter(cal => cal.id !== id);
+                saveData();
+                renderCalibrationView();
+            }
+        }
+
+        document.getElementById('calibrationForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('calId').value || Date.now().toString();
+            const calItem = {
+                id: id,
+                tag: document.getElementById('calTag').value,
+                description: document.getElementById('calDesc').value,
+                type: document.getElementById('calType').value,
+                range: document.getElementById('calRange').value,
+                lastDate: document.getElementById('calLastDate').value,
+                interval: document.getElementById('calInterval').value,
+                asFound: document.getElementById('calAsFound').value,
+                asLeft: document.getElementById('calAsLeft').value
+            };
+
+            const existingIndex = calibrationData.findIndex(cal => cal.id === id);
+            if (existingIndex >= 0) {
+                calibrationData[existingIndex] = calItem;
+            } else {
+                calibrationData.push(calItem);
+            }
+
+            saveData();
+            closeCalibrationModal();
+            renderCalibrationView();
+        });
+
+        function exportCalibrationData() {
+            const csv = [
+                ['Tag', 'Description', 'Type', 'Range', 'Last Cal Date', 'Next Due', 'As-Found', 'As-Left'],
+                ...calibrationData.map(cal => [
+                    cal.tag, cal.description, cal.type, cal.range, cal.lastDate, 
+                    calculateNextCalDate(cal.lastDate, cal.interval), cal.asFound || '', cal.asLeft || ''
+                ])
+            ].map(row => row.join(',')).join('\n');
+
+            downloadCSV(csv, 'calibration_tracker.csv');
+        }
+
+        // Inventory Functions
+        function renderInventoryView() {
+            renderInventoryStats();
+            renderInventoryTable();
+            updateIssueItemSelect();
+        }
+
+        function renderInventoryStats() {
+            const lowStock = inventoryData.filter(item => item.stock < item.minStock).length;
+            const totalValue = inventoryData.reduce((sum, item) => sum + (item.stock * item.price), 0);
+            const itemsOut = inventoryData.filter(item => item.issued && item.issued > 0).length;
+
+            document.getElementById('invLowStockCount').textContent = lowStock;
+            document.getElementById('invTotalItems').textContent = inventoryData.length;
+            document.getElementById('invTotalValue').textContent = `₱${totalValue.toLocaleString('en-PH', {minimumFractionDigits: 2})}`;
+            document.getElementById('invOutCount').textContent = itemsOut;
+        }
+
+        function renderInventoryTable() {
+            const tbody = document.getElementById('inventoryTableBody');
+            const searchTerm = document.getElementById('invSearchBox')?.value.toLowerCase() || '';
+            
+            let filteredData = inventoryData.filter(item => {
+                return item.partNumber.toLowerCase().includes(searchTerm) ||
+                       item.description.toLowerCase().includes(searchTerm) ||
+                       item.category.toLowerCase().includes(searchTerm);
+            });
+
+            tbody.innerHTML = filteredData.map(item => {
+                const isLowStock = item.stock < item.minStock;
+                const rowClass = isLowStock ? 'inventory-low' : 'inventory-ok';
+
+                return `
+                    <tr class="${rowClass}">
+                        <td>${item.partNumber}</td>
+                        <td>${item.description}</td>
+                        <td><span class="status-badge">${item.category}</span></td>
+                        <td><strong>${item.stock}</strong></td>
+                        <td>${item.minStock}</td>
+                        <td>₱${parseFloat(item.price).toLocaleString('en-PH', {minimumFractionDigits: 2})}</td>
+                        <td>${item.location}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-primary" onclick="editInventory('${item.id}')">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteInventory('${item.id}')">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterInventoryTable() {
+            renderInventoryTable();
+        }
+
+        function showInventoryModal(id = null) {
+            document.getElementById('inventoryModal').classList.add('active');
+            document.getElementById('inventoryForm').reset();
+            
+            if (id) {
+                const item = inventoryData.find(i => i.id === id);
+                if (item) {
+                    document.getElementById('invId').value = item.id;
+                    document.getElementById('invPartNumber').value = item.partNumber;
+                    document.getElementById('invDesc').value = item.description;
+                    document.getElementById('invCategory').value = item.category;
+                    document.getElementById('invStock').value = item.stock;
+                    document.getElementById('invMin').value = item.minStock;
+                    document.getElementById('invPrice').value = item.price;
+                    document.getElementById('invLocation').value = item.location;
+                }
+            }
+        }
+
+        function closeInventoryModal() {
+            document.getElementById('inventoryModal').classList.remove('active');
+        }
+
+        function editInventory(id) {
+            showInventoryModal(id);
+        }
+
+        function deleteInventory(id) {
+            if (confirm('Delete this inventory item?')) {
+                inventoryData = inventoryData.filter(item => item.id !== id);
+                saveData();
+                renderInventoryView();
+            }
+        }
+
+        document.getElementById('inventoryForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('invId').value || Date.now().toString();
+            const invItem = {
+                id: id,
+                partNumber: document.getElementById('invPartNumber').value,
+                description: document.getElementById('invDesc').value,
+                category: document.getElementById('invCategory').value,
+                stock: parseInt(document.getElementById('invStock').value),
+                minStock: parseInt(document.getElementById('invMin').value),
+                price: parseFloat(document.getElementById('invPrice').value),
+                location: document.getElementById('invLocation').value,
+                issued: 0
+            };
+
+            const existingIndex = inventoryData.findIndex(item => item.id === id);
+            if (existingIndex >= 0) {
+                inventoryData[existingIndex] = invItem;
+            } else {
+                inventoryData.push(invItem);
+            }
+
+            saveData();
+            closeInventoryModal();
+            renderInventoryView();
+        });
+
+        function showIssueModal() {
+            document.getElementById('issueModal').classList.add('active');
+            document.getElementById('issueForm').reset();
+            updateIssueItemSelect();
+        }
+
+        function closeIssueModal() {
+            document.getElementById('issueModal').classList.remove('active');
+        }
+
+        function updateIssueItemSelect() {
+            const select = document.getElementById('issueItemSelect');
+            select.innerHTML = inventoryData.map(item => 
+                `<option value="${item.id}">${item.partNumber} - ${item.description} (Stock: ${item.stock})</option>`
+            ).join('');
+        }
+
+        document.getElementById('issueForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const itemId = document.getElementById('issueItemSelect').value;
+            const qty = parseInt(document.getElementById('issueQty').value);
+            const item = inventoryData.find(i => i.id === itemId);
+
+            if (!item) {
+                alert('Item not found!');
+                return;
+            }
+
+            if (qty > item.stock) {
+                alert(`Insufficient stock! Available: ${item.stock}`);
+                return;
+            }
+
+            item.stock -= qty;
+            item.issued = (item.issued || 0) + qty;
+
+            saveData();
+            closeIssueModal();
+            renderInventoryView();
+            
+            alert(`✓ Issued ${qty} unit(s) of ${item.description}\nRemaining stock: ${item.stock}`);
+        });
+
+        function exportInventoryData() {
+            const csv = [
+                ['Part Number', 'Description', 'Category', 'Stock', 'Min Stock', 'Unit Price', 'Location', 'Total Value'],
+                ...inventoryData.map(item => [
+                    item.partNumber, item.description, item.category, item.stock, item.minStock, 
+                    item.price, item.location, (item.stock * item.price).toFixed(2)
+                ])
+            ].map(row => row.join(',')).join('\n');
+
+            downloadCSV(csv, 'spare_parts_inventory.csv');
+        }
+
+        // Utility Functions
+        function downloadCSV(content, filename) {
+            const blob = new Blob([content], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function renderAllViews() {
+            renderPMView();
+            renderAlarmView();
+            renderShiftView();
+            renderCalibrationView();
+            renderInventoryView();
+        }
+
+        // Sample Data Loader
+        function loadSampleData() {
+            if (pmData.length === 0) {
+                pmData = [
+                    {
+                        id: '1',
+                        woNumber: 'PM-2025-001',
+                        taskDesc: 'DCS Controller Redundancy Test',
+                        equipment: 'Main Controller A/B',
+                        frequency: 'Quarterly',
+                        dueDate: '2025-12-15',
+                        status: 'Pending',
+                        assignedTo: 'Engr. Santos',
+                        spareParts: 'Spare controller card'
+                    },
+                    {
+                        id: '2',
+                        woNumber: 'PM-2025-002',
+                        taskDesc: 'I/O Card Communication Check',
+                        equipment: 'All AI/AO/DI/DO Cards',
+                        frequency: 'Monthly',
+                        dueDate: '2025-11-25',
+                        status: 'In Progress',
+                        assignedTo: 'Engr. Reyes',
+                        spareParts: 'None'
+                    }
+                ];
+            }
+
+            if (calibrationData.length === 0) {
+                calibrationData = [
+                    {
+                        id: '1',
+                        tag: 'PT-101',
+                        description: 'Main Steam Pressure',
+                        type: 'AI',
+                        range: '0-1000 psi',
+                        lastDate: '2025-05-15',
+                        interval: '12',
+                        asFound: '999.5 psi',
+                        asLeft: '1000.0 psi'
+                    }
+                ];
+            }
+
+            if (inventoryData.length === 0) {
+                inventoryData = [
+                    {
+                        id: '1',
+                        partNumber: 'AI-8CH-001',
+                        description: 'Analog Input Card 8-Channel',
+                        category: 'AI Card',
+                        stock: 2,
+                        minStock: 2,
+                        price: 125000,
+                        location: 'Spare Room A, Shelf 1',
+                        issued: 0
+                    },
+                    {
+                        id: '2',
+                        partNumber: 'PSU-24VDC',
+                        description: '24VDC Redundant Power Supply',
+                        category: 'Power Supply',
+                        stock: 1,
+                        minStock: 2,
+                        price: 85000,
+                        location: 'Spare Room A, Shelf 2',
+                        issued: 0
+                    }
+                ];
+            }
+
+            saveData();
+        }
+
+        // Initialize on load
+        window.onload = initApp;
+    </script>
+</body>
+</html>
